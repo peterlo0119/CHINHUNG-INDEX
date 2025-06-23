@@ -19,11 +19,10 @@
 
 <div class="grid">
   {% for anime in anime_list %}
-  <div class="anime-card">
+  <div class="anime-card"  style="text-align: center;">
     <img src="{{ anime.image_url }}" alt="{{ anime.title }}">
     <h3>{{ anime.title }}</h3>
     <p>🆕 {{ anime.episode }}</p>
-    <p>🕒 {{ anime.publish_time }}</p>
     <p>👁️ {{ anime.view_count }}</p>
     <a href="{{ anime.url }}" target="_blank">▶ 觀看動畫</a>
   </div>
