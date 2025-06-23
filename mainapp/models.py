@@ -36,17 +36,18 @@ class VsingerChannel(BaseChannel): pass
 
 
 class AnimeCard(models.Model):
-    title = models.CharField(max_length=200)
-    episode = models.CharField(max_length=50)
-    view_count = models.CharField(max_length=50)
-    image_url = models.URLField()
-    url = models.URLField()
-    publish_time = models.CharField(max_length=100)
+    title = models.CharField(max_length=200)             # name
+    episode = models.CharField(max_length=50)            # num
+    view_count = models.CharField(max_length=50)         # view
+    image_url = models.URLField()                        # img
+    url = models.URLField()                              # url
+    publish_time = models.CharField(max_length=100)      # times
     last_updated = models.DateTimeField(auto_now=True)
 
+
     def __str__(self):
-        return self.name
-    
+        return self.title  # ✅ 正確
+  
     
 
 class Manga(models.Model):

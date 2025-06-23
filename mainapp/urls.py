@@ -10,5 +10,5 @@ urlpatterns = [
     path('novel/', views.novel, name='novel'),
     path("update_group/<str:group>/", frontend_update_group, name="frontend_update_group"),
     path("anime/update", views.frontend_update_anime, name="update_anime"),
-    path("manga/", mainapp.views.manga, name="manga"),
+    path("update_manga/", views.update_manga, name="update_manga"),
 ]

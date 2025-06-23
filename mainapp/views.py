@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
-from django.http import HttpRequest
+from django.http import HttpRequest, JsonResponse
 from datetime import datetime
 from dateutil.parser import parse
 from django.contrib import messages
 from django.core.management import call_command
+from mainapp.utils.anime_scraper import update_anime_data
 
 from .models import (
     HololiveChannel, NijisanjiChannel, AogiriChannel,
@@ -22,15 +23,17 @@ from bs4 import BeautifulSoup
 def index(request):
     return render(request, 'mainapp/index.html')
 
+def anime(request):
+    anime_list = AnimeCard.objects.all().order_by('-last_updated')
+    return render(request, "mainapp/anime.html", {"anime_list": anime_list})
+
+
 def manga(request):
-    return render(request, 'mainapp/manga.html')
+    manga_data = Manga.objects.all().order_by('-update_time')
+    return render(request, "mainapp/manga.html", {"manga_data": manga_data})
 
 def novel(request):
     return render(request, 'mainapp/novel.html')
-
-def anime(request):
-    anime_list = AnimeCard.objects.all().order_by('-id')[:20]
-    return render(request, 'mainapp/anime.html', {'anime_list': anime_list})
 
 
 # 分類對應模型
@@ -153,11 +156,10 @@ def frontend_update_anime(request):
     return redirect("anime")
 
 
-
-def manga(request):
-    manga_data = Manga.objects.all().order_by('-update_time')
-    return render(request, "manga.html", {"manga_data": manga_data})
-
 def update_manga(request):
     update_manga_data()
     return redirect("manga")
+
+def refresh_anime(request):
+    update_anime_data()
+    return JsonResponse({"status": "success", "message": "已更新動畫資料"})

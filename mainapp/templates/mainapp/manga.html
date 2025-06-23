@@ -1,15 +1,30 @@
-{% extends "base.html" %}
+{% extends "mainapp/layout.html" %}
+{% block title %}📚 漫畫追蹤{% endblock %}
+
 {% block content %}
-<h2 class="text-2xl mb-4">📚 最新更新漫畫</h2>
-<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-  {% for m in manga_data %}
-    <div class="rounded-xl shadow p-2 bg-white">
-      <a href="{{ m.url }}" target="_blank">
-        <img src="{{ m.img }}" class="w-full rounded-xl" loading="lazy">
-        <div class="text-sm mt-1 font-bold truncate">{{ m.title }}</div>
-        <div class="text-xs text-gray-500 truncate">{{ m.num }}</div>
-      </a>
-    </div>
+
+<div style="text-align: right; margin-bottom: 10px;">
+  <form method="POST" action="{% url 'update_manga' %}" style="text-align: right;">
+    {% csrf_token %}
+    <button type="submit" style="background-color:#ffcc00; padding:6px 12px; border-radius:5px; font-weight:bold;">
+      🛠 更新資料
+    </button>
+  </form>
+</div>
+
+<h1 style="text-align:center; font-size: 2rem; line-height: 1.5; margin-bottom: 20px;">
+  📖～〰～〰～≡ 漫畫更新一覽
+</h1>
+
+<div class="grid">
+  {% for manga in manga_data %}
+  <div class="anime-card" style="text-align: center;">
+    <img src="{{ manga.img }}" alt="{{ manga.title }}">
+    <h3>{{ manga.title }}</h3>
+    <p>🆕 {{ manga.num }}</p>
+    <a href="{{ manga.url }}" target="_blank">📖 閱讀漫畫</a>
+  </div>
   {% endfor %}
 </div>
+
 {% endblock %}
