@@ -3,10 +3,11 @@ from django.http import HttpRequest
 from datetime import datetime
 from dateutil.parser import parse
 from django.contrib import messages
+from django.core.management import call_command
 
 from .models import (
     HololiveChannel, NijisanjiChannel, AogiriChannel,
-    MilprChannel, SelfChannel, VsingerChannel
+    MilprChannel, SelfChannel, VsingerChannel, AnimeCard
 )
 from mainapp.utils.youtube_utils import update_channel_info
 
@@ -20,6 +21,10 @@ def manga(request):
 
 def novel(request):
     return render(request, 'mainapp/novel.html')
+
+def anime(request):
+    anime_list = AnimeCard.objects.all().order_by('-id')[:20]
+    return render(request, 'mainapp/anime.html', {'anime_list': anime_list})
 
 
 # 分類對應模型
@@ -135,56 +140,8 @@ def stream(request, group):
     })
 
 
-# 動畫頁面（維持 Selenium 爬蟲）
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from bs4 import BeautifulSoup
-import time
-
-def anime(request):
-    url = "https://ani.gamer.com.tw/"
-    options = Options()
-    options.add_argument("--headless")
-    options.add_argument("--disable-gpu")
-    options.add_argument("--window-size=1920,1080")
-    service = Service(executable_path="C:\\Program Files\\Google\\Chrome\\Application\\chromedriver.exe")  # <- 指定路徑
-    driver = webdriver.Chrome(service=service, options=options)
-
-    driver.get(url)
-    time.sleep(2)
-
-    try:
-        WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CLASS_NAME, "anime-content-block"))
-        )
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(2)
-
-        soup = BeautifulSoup(driver.page_source, "lxml")
-        main = soup.find_all("div", class_="anime-content-block")[:20]
-
-        data = []
-        for m in main:
-            try:
-                name = m.find("p", class_="anime-name").text.strip()
-                num = m.find("div", class_="anime-episode").find("p").text.strip()
-                view = m.find("div", class_="anime-watch-number").find("p").text.strip()
-                link = "https://ani.gamer.com.tw/" + m.find("div", class_="anime-block").find("a").get("href")
-                img_tag = m.find("div", class_="anime-blocker").find("img")
-                img = img_tag.get("data-src") or img_tag.get("src")
-                times = m.find("div", class_="anime-hours-block").find("span").text.strip()
-
-                data.append({
-                    "name": name, "img": img, "url": link, "num": num, "times": times, "view": view
-                })
-            except:
-                continue
-    except:
-        data = []
-
-    driver.quit()
-    return render(request, 'mainapp/anime.html', {'anime_list': data})
+def frontend_update_anime(request):
+    if request.method == "POST":
+        call_command("fetch_anime_data")
+        messages.success(request, "✅ 動畫資料已更新")
+    return redirect("anime")

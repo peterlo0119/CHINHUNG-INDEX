@@ -31,3 +31,18 @@ class AogiriChannel(BaseChannel): pass
 class MilprChannel(BaseChannel): pass
 class SelfChannel(BaseChannel): pass
 class VsingerChannel(BaseChannel): pass
+
+
+
+
+class AnimeCard(models.Model):
+    title = models.CharField(max_length=200)
+    episode = models.CharField(max_length=50)
+    view_count = models.CharField(max_length=50)
+    image_url = models.URLField()
+    url = models.URLField()
+    publish_time = models.CharField(max_length=100)
+    last_updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name

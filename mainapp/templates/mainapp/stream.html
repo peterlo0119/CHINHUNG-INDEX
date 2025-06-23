@@ -3,11 +3,14 @@
 {% block content %}
 
 <div style="text-align: right; margin-bottom: 10px;">
-    <form method="post" action="{% url 'frontend_update_group' table %}">
-        {% csrf_token %}
-        <button type="submit">🔄 更新 {{ table }} 頁面資料</button>
-    </form>
+  <form method="post" action="{% url 'frontend_update_group' table %}">
+    {% csrf_token %}
+    <button type="submit" style="background-color:#ffcc00; padding:6px 12px; border-radius:5px; font-weight:bold;">
+      🛠 更新資料
+    </button>
+  </form>
 </div>
+
 
 <h1 style="text-align:center;">
   {% if table == 'hololive' %}🎬 Hololive 直播情報

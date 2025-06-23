@@ -4,20 +4,31 @@
 
 {% block content %}
 
+<div style="text-align: right; margin-bottom: 10px;">
+    <form method="POST" action="{% url 'update_anime' %}" style="text-align: right;">
+      {% csrf_token %}
+      <button type="submit" style="background-color:#ffcc00; padding:6px 12px; border-radius:5px; font-weight:bold;">
+        🛠 更新資料
+      </button>
+    </form>
+    
 <h1 style="text-align:center; font-size: 2rem; line-height: 1.5; margin-bottom: 20px;">
   🐲～〰～〰～≡ 巴哈動畫瘋更新
 </h1>
 
+
 <div class="grid">
   {% for anime in anime_list %}
   <div class="anime-card">
-    <img src="{{ anime.img }}" alt="{{ anime.name }}">
-    <h3>{{ anime.name }}</h3>
-    <p>🆕 {{ anime.num }}</p>
-    <p>🕒 {{ anime.times }}</p>
-    <p>👁️ {{ anime.view }}</p>
+    <img src="{{ anime.image_url }}" alt="{{ anime.title }}">
+    <h3>{{ anime.title }}</h3>
+    <p>🆕 {{ anime.episode }}</p>
+    <p>🕒 {{ anime.publish_time }}</p>
+    <p>👁️ {{ anime.view_count }}</p>
     <a href="{{ anime.url }}" target="_blank">▶ 觀看動畫</a>
   </div>
   {% endfor %}
 </div>
+
+
 {% endblock %}
