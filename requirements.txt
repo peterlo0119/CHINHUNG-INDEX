@@ -5,3 +5,4 @@ isodate
 beautifulsoup4
 requests
 lxml
+python-dateutil
