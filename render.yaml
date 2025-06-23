@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: ytstreamsite
+    env: python
+    buildCommand: ""
+    startCommand: "gunicorn ytstreamsite.wsgi:application"
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: ytstreamsite.settings
