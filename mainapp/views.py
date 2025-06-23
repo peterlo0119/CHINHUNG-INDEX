@@ -8,7 +8,8 @@ from .models import (
     HololiveChannel, NijisanjiChannel, AogiriChannel,
     MilprChannel, SelfChannel, VsingerChannel
 )
-from .youtube_utils import update_channel_info  # 負責資料更新處理
+from mainapp.utils.youtube_utils import update_channel_info
+
 
 # 頁面：首頁、漫畫、小說
 def index(request):

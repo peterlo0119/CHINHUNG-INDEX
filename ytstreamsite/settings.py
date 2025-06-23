@@ -3,8 +3,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = 'dummy-secret-key'
 DEBUG = True
-ALLOWED_HOSTS = ['chinhung.onrender.com']
-
+ALLOWED_HOSTS = ['chinhung.onrender.com', '127.0.0.1', 'localhost']
+#'chinhung.onrender.com'
 INSTALLED_APPS = [
     'mainapp',
     'django.contrib.admin',

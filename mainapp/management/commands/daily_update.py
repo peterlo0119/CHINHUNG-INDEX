@@ -1,20 +1,38 @@
 from django.core.management.base import BaseCommand
-from mainapp.views import get_db_connection, get_channel_info, update_channel_cache
+from mainapp.models import (
+    HololiveChannel, NijisanjiChannel, AogiriChannel,
+    SelfChannel, MilprChannel, VsingerChannel
+)
+from mainapp.utils.youtube_utils import update_channel_info, update_channel_cache
+
 
 class Command(BaseCommand):
     help = "每日更新頻道快取資料"
 
     def handle(self, *args, **kwargs):
-        tables = ["hololive", "nijisanji", "aogiri", "self", "milpr", "singer"]
-        for table in tables:
-            conn = get_db_connection()
-            cur = conn.cursor()
-            cur.execute(f"SELECT name, channel_url FROM {table}")
-            rows = cur.fetchall()
-            conn.close()
+        table_map = {
+            'hololive': HololiveChannel,
+            'nijisanji': NijisanjiChannel,
+            'aogiri': AogiriChannel,
+            'self': SelfChannel,
+            'milpr': MilprChannel,
+            'singer': VsingerChannel
+        }
 
-            for row in rows:
-                self.stdout.write(f"更新 {row['name']}...")
-                result = get_channel_info(row["channel_url"])
-                if result and 'error' not in result:
-                    update_channel_cache(table, row["name"], result)
+        for name, model in table_map.items():
+            self.stdout.write(self.style.NOTICE(f"🔁 正在更新 {name}..."))
+
+            for channel in model.objects.all():
+                self.stdout.write(f"  → 更新 {channel.name}...")
+
+                try:
+                    result = update_channel_info(channel.channel_url)
+                    if result and 'error' not in result:
+                        update_channel_cache(name, channel.name, result)
+                        self.stdout.write(self.style.SUCCESS(f"    ✅ {channel.name} 更新成功"))
+                    else:
+                        self.stdout.write(self.style.WARNING(f"    ⚠️ {channel.name} 更新失敗"))
+                except Exception as e:
+                    self.stdout.write(self.style.ERROR(f"    ❌ 發生錯誤：{e}"))
+
+        self.stdout.write(self.style.SUCCESS("🎉 所有頻道資料更新完畢"))

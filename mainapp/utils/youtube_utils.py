@@ -1,7 +1,13 @@
 import itertools
 from datetime import datetime, timedelta
 from googleapiclient.discovery import build
+from django.utils.timezone import now
 import isodate
+
+from mainapp.models import (
+    HololiveChannel, NijisanjiChannel, AogiriChannel,
+    MilprChannel, SelfChannel, VsingerChannel
+)
 
 # 你的 YouTube API 金鑰（循環使用）
 API_KEYS = [
@@ -14,11 +20,18 @@ API_KEYS = [
 ]
 api_key_cycle = itertools.cycle(API_KEYS)
 
+MODEL_MAP = {
+    "hololive": HololiveChannel,
+    "nijisanji": NijisanjiChannel,
+    "aogiri": AogiriChannel,
+    "self": SelfChannel,
+    "milpr": MilprChannel,
+    "singer": VsingerChannel,
+}
 
 def get_youtube_client():
     key = next(api_key_cycle)
     return build("youtube", "v3", developerKey=key)
-
 
 def extract_channel_id(url):
     if "/channel/" in url:
@@ -26,7 +39,6 @@ def extract_channel_id(url):
     elif "@" in url:
         return None
     return None
-
 
 def update_channel_info(channel_url):
     channel_id = extract_channel_id(channel_url)
@@ -129,3 +141,33 @@ def update_channel_info(channel_url):
         'live': live_info,
         'latest_video': video_data
     }
+
+def update_channel_cache(group, channel_name, data):
+    Model = MODEL_MAP.get(group.lower())
+    if not Model:
+        raise ValueError(f"找不到對應的 model：{group}")
+
+    try:
+        obj = Model.objects.get(name=channel_name)
+    except Model.DoesNotExist:
+        print(f"❌ {channel_name} 不存在於 {group}")
+        return
+
+    obj.channel_avatar = data["channel_avatar"]
+    obj.latest_video_title = data["latest_video"]["title"]
+    obj.latest_video_url = data["latest_video"]["url"]
+    obj.latest_video_thumbnail = data["latest_video"]["thumbnail"]
+    obj.latest_video_duration = str(data["latest_video"]["duration"])
+    obj.latest_video_views = data["latest_video"]["view_count"]
+    obj.latest_video_published = data["latest_video"]["published_at"]
+
+    if data.get("live"):
+        obj.live_title = data["live"]["title"]
+        obj.live_url = data["live"]["url"]
+        obj.live_thumbnail = data["live"]["thumbnail"]
+        obj.live_start_time = data["live"]["start_time"]
+    else:
+        obj.live_title = obj.live_url = obj.live_thumbnail = obj.live_start_time = ""
+
+    obj.last_updated = now()
+    obj.save()
