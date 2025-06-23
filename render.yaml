@@ -2,7 +2,9 @@ services:
   - type: web
     name: ytstreamsite
     env: python
-    buildCommand: ""
+    buildCommand: |
+      pip install -r requirements.txt
+      python manage.py collectstatic --noinput
     startCommand: "gunicorn ytstreamsite.wsgi:application"
     envVars:
       - key: DJANGO_SETTINGS_MODULE

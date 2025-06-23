@@ -1,0 +1,311 @@
+body {
+    font-family: "Noto Sans TC", sans-serif;
+    padding: 20px;
+    background: #f5f5f5;
+}
+
+h1 {
+    text-align: center;
+}
+
+/* 群組按鈕 */
+.group-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin: 20px 0;
+    overflow-x: auto;
+    padding: 10px;
+}
+
+.group-buttons a {
+    padding: 8px 14px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 8px;
+    font-weight: bold;
+    text-decoration: none;
+    white-space: nowrap;
+    flex: 0 0 auto;
+    transition: background-color 0.2s;
+}
+
+.group-buttons a:hover {
+    background-color: #0056b3;
+}
+
+.group-buttons a.selected {
+    background-color: #003f7f;
+    border: 2px solid white;
+}
+
+/* 卡片橫向區塊 */
+.card-row {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 16px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding: 16px;
+    margin: 16px auto;
+    max-width: 900px;
+    background-color: white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.card-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.card-content {
+    flex-grow: 1;
+}
+
+.card-section {
+    margin-top: 10px;
+}
+
+.thumb {
+    width: 100%;
+    max-width: 300px;
+    border-radius: 8px;
+}
+
+/* 載入動畫 */
+.loader {
+    margin-top: 30px;
+    text-align: center;
+    font-size: 18px;
+    color: #555;
+    display: none;
+}
+
+.loader span {
+    animation: spin 1s linear infinite;
+    font-size: 28px;
+    margin-right: 8px;
+    display: inline-block;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 下拉式選單（若你日後會使用） */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropbtn {
+    color: white;
+    padding: 14px 20px;
+    font-size: 16px;
+    background-color: #007bff;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #444;
+    min-width: 160px;
+    z-index: 9999;
+    border-radius: 8px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.dropdown-content.show {
+    display: block;
+}
+
+.dropdown-content a {
+    color: white;
+    padding: 12px 16px;
+    display: block;
+    text-decoration: none;
+}
+
+.dropdown-content a:hover {
+    background-color: #666;
+}
+
+.arrow {
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+
+.arrow.up {
+    transform: rotate(180deg);
+}
+
+.navbar {
+    background-color: #333;
+    padding: 10px 20px;
+}
+
+.navbar ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.navbar li {
+    position: relative;
+}
+
+.navbar a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 10px;
+    display: block;
+}
+
+.navbar a:hover {
+    background-color: #444;
+    border-radius: 5px;
+}
+
+/* 下拉選單 */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #222;
+    padding: 10px;
+    top: 100%;
+    left: 0;
+    z-index: 999;
+    min-width: 180px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.dropdown-content a {
+    padding: 8px 12px;
+    color: white;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+.card-flex {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding: 16px;
+    margin: 16px auto;
+    max-width: 1000px;
+    background-color: white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.card-left {
+    width: 120px;
+    text-align: center;
+}
+
+.card-left img.card-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.card-right {
+    display: flex;
+    flex: 1;
+    gap: 20px;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.video-block, .live-block {
+    flex: 1 1 300px;
+}
+
+.thumb {
+    width: 100%;
+    max-width: 300px;
+    border-radius: 8px;
+}
+.no-live {
+    width: 100%;
+    max-width: 300px;
+    padding: 10px;
+    background-color: #eee;
+    border-radius: 8px;
+    text-align: center;
+    color: #666;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto; /* 讓網格置中 */
+}
+
+.anime-card {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  transition: transform 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.anime-card:hover {
+  transform: scale(1.02);
+}
+.anime-card img {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+.anime-card h3 {
+  font-size: 1.1rem;
+  margin-bottom: 6px;
+}
+.anime-card p {
+  margin: 2px 0;
+}
+.anime-card a {
+  margin-top: 10px;
+  padding: 8px;
+  background-color: #4CAF50;
+  color: white;
+  text-align: center;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+}
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+.content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
