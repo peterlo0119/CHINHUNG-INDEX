@@ -5,7 +5,19 @@ services:
     buildCommand: |
       pip install -r requirements.txt
       python manage.py collectstatic --noinput
-    startCommand: "gunicorn ytstreamsite.wsgi:application"
+      python manage.py migrate  # 如有使用資料庫請加上
+    startCommand: gunicorn ytstreamsite.wsgi:application
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: ytstreamsite.settings
+      - key: PYTHON_VERSION
+        value: 3.11
+
+    staticPublishPath: staticfiles
+
+    autoDeploy: true
+
+    schedules:
+      - name: update-manga-daily
+        cron: "0 10 * * *"  # 每日台灣時間 18:00 執行
+        command: python manage.py runscript update_manga

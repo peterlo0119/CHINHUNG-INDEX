@@ -7,9 +7,15 @@ from django.core.management import call_command
 
 from .models import (
     HololiveChannel, NijisanjiChannel, AogiriChannel,
-    MilprChannel, SelfChannel, VsingerChannel, AnimeCard
+    MilprChannel, SelfChannel, VsingerChannel, AnimeCard, Manga
 )
 from mainapp.utils.youtube_utils import update_channel_info
+from .utils.manga_scraper import update_manga_data
+
+
+import requests
+from bs4 import BeautifulSoup
+
 
 
 # 頁面：首頁、漫畫、小說
@@ -145,3 +151,13 @@ def frontend_update_anime(request):
         call_command("fetch_anime_data")
         messages.success(request, "✅ 動畫資料已更新")
     return redirect("anime")
+
+
+
+def manga(request):
+    manga_data = Manga.objects.all().order_by('-update_time')
+    return render(request, "manga.html", {"manga_data": manga_data})
+
+def update_manga(request):
+    update_manga_data()
+    return redirect("manga")

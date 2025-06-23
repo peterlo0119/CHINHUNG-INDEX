@@ -10,3 +10,4 @@ selenium
 gunicorn
 isodate
 whitenoise
+django-extensions

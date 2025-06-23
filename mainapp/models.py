@@ -46,3 +46,15 @@ class AnimeCard(models.Model):
 
     def __str__(self):
         return self.name
+    
+    
+
+class Manga(models.Model):
+    title = models.CharField(max_length=200)
+    url = models.URLField()
+    img = models.URLField()
+    num = models.CharField(max_length=50)
+    update_time = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
