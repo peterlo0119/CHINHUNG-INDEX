@@ -1,0 +1,23 @@
+{% extends "mainapp/layout.html" %}
+
+{% block title %}📫 動畫追蹤{% endblock %}
+
+{% block content %}
+
+<h1 style="text-align:center; font-size: 2rem; line-height: 1.5; margin-bottom: 20px;">
+  🐲～〰～〰～≡ 巴哈動畫瘋更新
+</h1>
+
+<div class="grid">
+  {% for anime in anime_list %}
+  <div class="anime-card">
+    <img src="{{ anime.img }}" alt="{{ anime.name }}">
+    <h3>{{ anime.name }}</h3>
+    <p>🆕 {{ anime.num }}</p>
+    <p>🕒 {{ anime.times }}</p>
+    <p>👁️ {{ anime.view }}</p>
+    <a href="{{ anime.url }}" target="_blank">▶ 觀看動畫</a>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

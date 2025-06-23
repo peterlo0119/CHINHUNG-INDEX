@@ -1,0 +1,189 @@
+from django.shortcuts import render, redirect
+from django.http import HttpRequest
+from datetime import datetime
+from dateutil.parser import parse
+from django.contrib import messages
+
+from .models import (
+    HololiveChannel, NijisanjiChannel, AogiriChannel,
+    MilprChannel, SelfChannel, VsingerChannel
+)
+from .youtube_utils import update_channel_info  # 負責資料更新處理
+
+# 頁面：首頁、漫畫、小說
+def index(request):
+    return render(request, 'mainapp/index.html')
+
+def manga(request):
+    return render(request, 'mainapp/manga.html')
+
+def novel(request):
+    return render(request, 'mainapp/novel.html')
+
+
+# 分類對應模型
+MODEL_MAP = {
+    "hololive": HololiveChannel,
+    "nijisanji": NijisanjiChannel,
+    "aogiri": AogiriChannel,
+    "milpr": MilprChannel,
+    "self": SelfChannel,
+    "singer": VsingerChannel,
+}
+
+
+
+def frontend_update_group(request, group):
+    if request.method == "POST":
+        Model = MODEL_MAP.get(group.lower())
+        if not Model:
+            messages.error(request, "找不到對應的資料表")
+            return redirect(f"/stream/{group}")
+
+        all_channels = Model.objects.all()
+        updated_count = 0
+        
+        for obj in all_channels:
+            try:
+                info = update_channel_info(obj.channel_url)
+                obj.channel_avatar = info["channel_avatar"]
+                obj.latest_video_title = info["latest_video"]["title"]
+                obj.latest_video_url = info["latest_video"]["url"]
+                obj.latest_video_thumbnail = info["latest_video"]["thumbnail"]
+                obj.latest_video_duration = str(info["latest_video"]["duration"])
+                obj.latest_video_views = info["latest_video"]["view_count"]
+                obj.latest_video_published = info["latest_video"]["published_at"]
+
+                if info.get("live"):
+                    obj.live_title = info["live"]["title"]
+                    obj.live_url = info["live"]["url"]
+                    obj.live_thumbnail = info["live"]["thumbnail"]
+                    obj.live_start_time = info["live"]["start_time"]
+                else:
+                    obj.live_title = obj.live_url = obj.live_thumbnail = obj.live_start_time = ""
+
+                obj.last_updated = datetime.now()  # ✅ 寫入最後更新時間
+                obj.save()
+                updated_count += 1
+            except Exception as e:
+                print(f"更新 {obj.name} 失敗：{e}")
+
+        messages.success(request, f"✅ {group} 頁面資料已更新，共 {updated_count} 筆")
+        return redirect(f"/stream/{group}")
+
+
+
+# 頁面：直播卡片顯示
+def stream(request, group):
+    selected = request.GET.get("group", "")
+    Model = MODEL_MAP.get(group)
+    if not Model:
+        return render(request, 'mainapp/stream.html', {'error': '無效的 group'})
+
+    groups = Model.objects.values_list("group_name", flat=True).distinct()
+    rows = Model.objects.filter(group_name=selected) if selected else Model.objects.all()
+    latest_update = rows.order_by("-last_updated").first().last_updated if rows else None
+    now = datetime.now()
+    cards = []
+
+    for row in rows:
+        try:
+            dt_start = parse(row.live_start_time) if row.live_start_time else None
+            live = {
+                'title': row.live_title,
+                'url': row.live_url,
+                'thumbnail': row.live_thumbnail,
+                'start_time': dt_start.strftime("%Y-%m-%d %H:%M") if dt_start and row.live_url else ''
+            } if dt_start and row.live_url and dt_start > now else {
+                'title': '目前沒有規劃',
+                'url': '',
+                'thumbnail': '',
+                'start_time': ''
+            }
+
+            video = {
+                'title': row.latest_video_title,
+                'url': row.latest_video_url,
+                'thumbnail': row.latest_video_thumbnail,
+                'duration': row.latest_video_duration,
+                'view_count': row.latest_video_views,
+                'published_at': row.latest_video_published
+            }
+
+            cards.append({
+                'name': row.name,
+                'url': row.channel_url,
+                'info': {
+                    'channel_title': row.name,
+                    'channel_avatar': row.channel_avatar,
+                    'latest_video': video,
+                    'live': live
+                }
+            })
+
+        except Exception as e:
+            print(f"錯誤處理資料 {row.name}: {e}")
+
+    return render(request, 'mainapp/stream.html', {
+        'table': group,
+        'groups': groups,
+        'selected_group': selected,
+        'cards': cards,
+        'now': now,
+        'latest_update': latest_update
+    })
+
+
+# 動畫頁面（維持 Selenium 爬蟲）
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from bs4 import BeautifulSoup
+import time
+
+def anime(request):
+    url = "https://ani.gamer.com.tw/"
+    options = Options()
+    options.add_argument("--headless")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--window-size=1920,1080")
+    service = Service(executable_path="C:\\Program Files\\Google\\Chrome\\Application\\chromedriver.exe")  # <- 指定路徑
+    driver = webdriver.Chrome(service=service, options=options)
+
+    driver.get(url)
+    time.sleep(2)
+
+    try:
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.CLASS_NAME, "anime-content-block"))
+        )
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(2)
+
+        soup = BeautifulSoup(driver.page_source, "lxml")
+        main = soup.find_all("div", class_="anime-content-block")[:20]
+
+        data = []
+        for m in main:
+            try:
+                name = m.find("p", class_="anime-name").text.strip()
+                num = m.find("div", class_="anime-episode").find("p").text.strip()
+                view = m.find("div", class_="anime-watch-number").find("p").text.strip()
+                link = "https://ani.gamer.com.tw/" + m.find("div", class_="anime-block").find("a").get("href")
+                img_tag = m.find("div", class_="anime-blocker").find("img")
+                img = img_tag.get("data-src") or img_tag.get("src")
+                times = m.find("div", class_="anime-hours-block").find("span").text.strip()
+
+                data.append({
+                    "name": name, "img": img, "url": link, "num": num, "times": times, "view": view
+                })
+            except:
+                continue
+    except:
+        data = []
+
+    driver.quit()
+    return render(request, 'mainapp/anime.html', {'anime_list': data})

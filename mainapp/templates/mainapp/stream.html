@@ -1,0 +1,92 @@
+{% extends "mainapp/layout.html" %}
+{% block title %}直播追蹤{% endblock %}
+{% block content %}
+
+<div style="text-align: right; margin-bottom: 10px;">
+    <form method="post" action="{% url 'frontend_update_group' table %}">
+        {% csrf_token %}
+        <button type="submit">🔄 更新 {{ table }} 頁面資料</button>
+    </form>
+</div>
+
+<h1 style="text-align:center;">
+  {% if table == 'hololive' %}🎬 Hololive 直播情報
+  {% elif table == 'nijisanji' %}🎮 にじさんじ 直播情報
+  {% elif table == 'aogiri' %}🏫 あおぎり高校 直播情報
+  {% elif table == 'milpr' %}🎤 ミリプロ 直播情報
+  {% elif table == 'self' %}🏠 個人勢 直播情報
+  {% elif table == 'singer' %}🎤 Vsinger 直播情報
+  {% endif %}
+</h1>
+
+<div class="group-buttons">
+    <a href="{% url 'stream' table %}" class="group-btn {% if not selected_group %}selected{% endif %}">全部</a>
+    {% for g in groups %}
+        <a href="{% url 'stream' table %}?group={{ g }}" class="group-btn {% if g == selected_group %}selected{% endif %}">
+           {{ g }}
+        </a>
+    {% endfor %}
+</div>
+
+<div class="loader" id="loader">
+  <span>🔄</span> 載入中，請稍候...
+</div>
+
+{% for card in cards %}
+<div class="card-flex">
+  <div class="card-left">
+    <a href="{{ card.url }}" target="_blank">
+      <img class="card-avatar" src="{{ card.info.channel_avatar }}" alt="{{ card.name }}">
+    </a>
+    <p><strong>{{ card.name }}</strong></p>
+  </div>
+
+  <div class="card-right">
+    <div class="video-block">
+      <p><b>🎬 最新影片：</b></p>
+      <a href="{{ card.info.latest_video.url }}" target="_blank">
+        <img class="thumb" src="{{ card.info.latest_video.thumbnail }}"><br>
+        {{ card.info.latest_video.title }}
+      </a>
+      <p>🗓 上傳時間：{{ card.info.latest_video.published_at }}</p>
+      <p>⏱ 長度：{{ card.info.latest_video.duration }}</p>
+      <p>👁 觀看數：{{ card.info.latest_video.view_count }}</p>
+    </div>
+
+    <div class="live-block">
+      <p><b>📢 預計直播：</b></p>
+        {% if card.info.live and card.info.live.start_time %}
+            <a href="{{ card.info.live.url }}" target="_blank">
+                <img class="thumb" src="{{ card.info.live.thumbnail }}"><br>
+                {{ card.info.live.title }}
+            </a>
+            <p>🕒 預定開始：{{ card.info.live.start_time }}</p>
+        {% else %}
+            <div style="width:100%; max-width:300px; height:auto; background:#eee; border-radius:8px; padding:10px; text-align:center;">
+                <p style="margin:0;">目前沒有規劃</p>
+            </div>
+        {% endif %}
+    </div>
+
+  </div>
+</div>
+
+{% endfor %}
+{% if latest_update %}
+  <div style="text-align: right; margin-top: 30px; font-size: 14px; color: gray;">
+    最後更新時間：{{ latest_update|date:"Y-m-d H:i:s" }}
+  </div>
+{% endif %}
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const groupLinks = document.querySelectorAll('.group-btn');
+  const loader = document.getElementById('loader');
+  groupLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      loader.style.display = 'block';
+    });
+  });
+});
+</script>
+{% endblock %}

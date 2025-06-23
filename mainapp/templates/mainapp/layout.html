@@ -1,0 +1,54 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}CHIN HUNG DAILY MISSION{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'mainapp/style.css' %}">
+</head>
+
+<body>
+    <nav class="navbar">
+        <ul>
+            <li><a href="{% url 'index' %}">🏠 首頁</a></li>
+
+            <li class="dropdown">
+                <a class="dropbtn" onclick="toggleDropdown()">🎬 直播追蹤 <span class="arrow">▼</span></a>
+                <div id="dropdown-content" class="dropdown-content">
+                    <a href="{% url 'stream' 'hololive' %}">ホロライブ</a>
+                    <a href="{% url 'stream' 'nijisanji' %}">にじさんじ</a>
+                    <a href="{% url 'stream' 'aogiri' %}">あおぎり高校</a>
+                    <a href="{% url 'stream' 'milpr' %}">ミリプロ</a>
+                    <a href="{% url 'stream' 'self' %}">個人勢</a>
+                    <a href="{% url 'stream' 'singer' %}">VSinger</a>
+                </div>
+            </li>
+
+            <li><a href="{% url 'anime' %}">📫 動畫追蹤</a></li>
+            <li><a href="{% url 'manga' %}">📚 漫畫追蹤</a></li>
+            <li><a href="{% url 'novel' %}">📖 小說追蹤</a></li>
+        </ul>
+    </nav>
+
+    <div class="content" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+        {% block content %}{% endblock %}
+    </div>
+
+    <script>
+        function toggleDropdown() {
+            const content = document.getElementById("dropdown-content");
+            const arrow = document.querySelector(".dropbtn .arrow");
+            content.classList.toggle("show");
+            if (arrow) arrow.classList.toggle("up");
+        }
+
+        window.onclick = function (event) {
+            if (!event.target.closest('.dropdown')) {
+                document.getElementById("dropdown-content").classList.remove('show');
+                document.querySelector(".arrow")?.classList.remove('up');
+            }
+        };
+    </script>
+</body>
+</html>
