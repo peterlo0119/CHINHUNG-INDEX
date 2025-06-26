@@ -11,8 +11,6 @@
 <body>
     <nav class="navbar">
         <ul>
-            <li><a href="{% url 'index' %}">🏠 首頁</a></li>
-
             <li class="dropdown">
                 <a class="dropbtn" onclick="toggleDropdown()">🎬 直播追蹤 <span class="arrow">▼</span></a>
                 <div id="dropdown-content" class="dropdown-content">
@@ -49,6 +47,24 @@
                 document.querySelector(".arrow")?.classList.remove('up');
             }
         };
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     </script>
+
+
+<div class="floating-buttons">
+  <a href="{% url 'index' %}" class="float-btn">🏠 回首頁</a>
+  <a href="#" onclick="scrollToTop()" class="float-btn">🔝 回頂部</a>
+</div>
+
+<script>
+  function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+
+
 </body>
 </html>
