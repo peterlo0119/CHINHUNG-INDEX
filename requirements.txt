@@ -13,5 +13,5 @@ whitenoise
 django-extensions
 # --- AI 相關 ---
 tensorflow-cpu==2.10.0
-numpy
+numpy==1.24.4
 Pillow
