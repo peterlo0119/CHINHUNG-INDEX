@@ -17,6 +17,8 @@ from .utils.manga_scraper import update_manga_data
 import requests
 from bs4 import BeautifulSoup
 
+import os
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 
 
 # 頁面：首頁、漫畫、小說
@@ -163,3 +165,37 @@ def update_manga(request):
 def refresh_anime(request):
     update_anime_data()
     return JsonResponse({"status": "success", "message": "已更新動畫資料"})
+
+
+
+import base64
+import io
+from PIL import Image, ImageOps
+import numpy as np
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from django.conf import settings
+
+
+
+# 載入你的模型（只需執行一次）
+from tensorflow.keras.models import load_model
+MODEL_PATH = os.path.join(settings.BASE_DIR, 'mainapp', 'model', 'mnist_model.h5')
+model = load_model(MODEL_PATH)
+
+@csrf_exempt
+def predict_digit(request):
+    import json
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        img_str = data['image'].split(',')[1]
+        img_bytes = base64.b64decode(img_str)
+        img = Image.open(io.BytesIO(img_bytes)).convert('L')  # 灰階
+        img = ImageOps.invert(img)
+        img = img.resize((28, 28))
+        img_np = np.array(img) / 255.0
+        img_np = img_np.reshape(1, 28, 28, 1)
+        pred = model.predict(img_np)
+        result = int(np.argmax(pred))
+        img.save('debug_upload.png')
+        return JsonResponse({'result': result})

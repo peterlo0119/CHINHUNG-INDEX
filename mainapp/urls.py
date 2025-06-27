@@ -11,4 +11,5 @@ urlpatterns = [
     path("update_group/<str:group>/", frontend_update_group, name="frontend_update_group"),
     path("anime/update", views.frontend_update_anime, name="update_anime"),
     path("update_manga/", views.update_manga, name="update_manga"),
+    path('predict_digit/', views.predict_digit, name='predict_digit'),
 ]

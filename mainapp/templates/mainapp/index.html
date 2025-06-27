@@ -1,7 +1,159 @@
 {% extends "mainapp/layout.html" %}
 
-{% block title %}首頁{% endblock %}
+{% block title %}CHIN HUNG DASHBOARD{% endblock %}
 
 {% block content %}
-<h1 style="text-align:center;">✨ Chin Hung Daily Mission ✨</h1>
+<style>
+.card-mnist {
+  max-width: 520px;
+  margin: 40px auto 0 auto;
+  background: #f5f8ff;
+  border-radius: 2rem;
+  box-shadow: 0 8px 28px rgba(30,50,120,0.14), 0 1.5px 4px rgba(30,60,80,0.10);
+  padding: 36px 32px 30px 32px;
+  border: 2px solid #e1eaff;
+  transition: box-shadow 0.2s;
+}
+.card-mnist h2 {
+  text-align: center;
+  margin: 0 0 20px 0;
+  font-size: 2.0em;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+.canvas-result-wrapper {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 32px;
+  min-height: 240px;
+}
+.mnist-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+#canvas {
+  border: 2px solid #222;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 2px 8px #c8dafb3a;
+  display: block;
+}
+.mnist-btn-row.card-btn-row {
+  justify-content: center;
+  margin: 12px 0 0 0;  /* 距離上方有空隙，底下無需留太多 */
+  display: flex;
+  gap: 16px;
+}
+
+.mnist-btn {
+  padding: 8px 20px;
+  background: #5b89f9;
+  color: #fff;
+  border: none;
+  border-radius: 1rem;
+  font-size: 1.1em;
+  cursor: pointer;
+  font-weight: 500;
+  box-shadow: 0 1px 4px #0001;
+  transition: background 0.18s, box-shadow 0.18s;
+}
+.mnist-btn:hover {
+  background: #305ec5;
+  box-shadow: 0 2px 8px #2c4b9860;
+}
+.result-box-outer {
+  position: relative;
+  width: 120px;
+  height: 200px; 
+}
+.result-box {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  min-width: 120px;
+  min-height: 120px;
+  background: #fff;
+  border-radius: 1rem;
+  border: 2.5px solid #c9d6f5;
+  box-shadow: 0 1px 6px #b0c2e87a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.3em;
+  font-weight: bold;
+  color: #2043a2;
+  margin-left: 6px;
+}
+@media (max-width:600px) {
+  .canvas-result-wrapper { flex-direction: column; gap:18px; }
+  .result-box-outer { margin-left: 0; margin-top: 14px;}
+}
+</style>
+
+<h1 style="text-align:center;">✨ Chin Hung 作品區 ✨</h1>
+<div class="card-mnist">
+  <h2>練習手寫數字!!</h2>
+  <div class="canvas-result-wrapper">
+    <div class="mnist-left">
+      <canvas id="canvas" width="200" height="200"></canvas>
+    </div>
+    <div class="result-box-outer">
+      <div class="result-box">
+        <span id="result">?</span>
+      </div>
+    </div>
+  </div>
+  <!-- 🟦 新增：卡片底部整體置中的按鈕區 -->
+  <div class="mnist-btn-row card-btn-row">
+    <button onclick="recognize()" class="mnist-btn">辨識</button>
+    <button onclick="clearCanvas()" class="mnist-btn">清空</button>
+  </div>
+</div>
+
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+ctx.fillStyle = "#fff";
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+let drawing = false;
+
+canvas.addEventListener('mousedown', e => { drawing = true; });
+canvas.addEventListener('mouseup', e => { drawing = false; ctx.beginPath(); });
+canvas.addEventListener('mouseleave', e => { drawing = false; ctx.beginPath(); });
+canvas.addEventListener('mousemove', draw);
+
+function draw(e) {
+  if (!drawing) return;
+  ctx.lineWidth = 16;
+  ctx.lineCap = "round";
+  ctx.strokeStyle = "#000";
+  ctx.lineTo(e.offsetX, e.offsetY);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(e.offsetX, e.offsetY);
+}
+function clearCanvas() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  document.getElementById('result').textContent = '?';
+}
+function recognize() {
+  const imgData = canvas.toDataURL("image/png");
+  fetch('/predict_digit/', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}'},
+    body: JSON.stringify({ image: imgData })
+  })
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById('result').textContent = data.result;
+  });
+}
+</script>
 {% endblock %}

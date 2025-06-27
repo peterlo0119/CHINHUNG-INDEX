@@ -1,5 +1,6 @@
 {% extends "mainapp/layout.html" %}
 {% block title %}直播追蹤{% endblock %}
+
 {% block content %}
 
 <div style="text-align: right; margin-bottom: 10px;">
@@ -11,6 +12,206 @@
   </form>
 </div>
 
+
+<style>
+body {
+    font-family: "Microsoft JhengHei", Calibri, "Noto Sans TC", Arial, sans-serif;
+    background: #f6f7fb;
+}
+.triple-card-row {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 36px;
+    margin: 36px auto 0 auto;
+    max-width: 1400px;
+}
+.triple-card {
+    background: #f8faff; /* 這裡換你想要的卡片顏色 */
+    border: 2px solid #222;
+    border-radius: 26px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+    padding: 36px 28px 32px 28px;
+    width: 380px;
+    min-height: 520px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.triple-card.avatar-card {
+    justify-content: center;
+}
+.triple-card:not(.avatar-card) {
+    justify-content: flex-start;
+}
+
+.avatar-box {
+    width: 140px;
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 22px;
+}
+.avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid #b3d7fa;
+    object-fit: cover;
+    background: #e3f1fa;
+}
+.channel-name {
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: #3472a6;
+    letter-spacing: 2px;
+    text-align: center;
+    margin: 0;
+    margin-top: 16px;
+}
+.video-block, .live-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+.section-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #6d60ac;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.section-title i {
+    margin-right: 8px;
+    font-style: normal;
+}
+.thumb {
+    width: 100%;
+    max-width: 380px;
+    aspect-ratio: 16/9;
+    border-radius: 12px;
+    display: block;
+    object-fit: cover;
+    margin: 0 auto;
+}
+.video-title, .live-title {
+    color: #2366a2;
+    font-weight: bold;
+    font-size: 1.12em;
+    text-align: left;
+    margin: 12px 0 0 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-all;
+}
+.live-title { color: #c34a91; }
+.video-meta {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+.meta-list {
+    display: inline-block;
+    text-align: left;
+}
+.meta-row {
+    display: flex;
+    align-items: center;
+    font-size: 1.08rem;
+    color: #444;
+    gap: 6px;
+    font-family: "Noto Sans TC", sans-serif;
+}
+.meta-icon {
+    font-size: 1.18em;
+    margin-right: 7px;
+    opacity: 0.9;
+    width: 28px;
+    text-align: center;
+}
+.meta-text {
+    font-size: 1em;
+    letter-spacing: 0.5px;
+}
+.no-live {
+    padding: 18px;
+    margin-top: 18px;
+    background: #f6f6fa;
+    border-radius: 10px;
+    color: #bbb;
+    width: 90%;
+    font-size: 1.13rem;
+    text-align: center;
+}
+@media (max-width: 1200px) {
+    .triple-card-row { flex-direction: column; align-items: center; gap: 14px; }
+    .triple-card { width: 96vw; max-width: 360px; margin: 0 auto; }
+}
+/* 群組按鈕 */
+.group-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin: 20px 0 10px 0;
+    overflow-x: auto;
+    padding: 10px;
+}
+.group-btn {
+    padding: 8px 14px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 8px;
+    font-weight: bold;
+    text-decoration: none;
+    white-space: nowrap;
+    flex: 0 0 auto;
+    transition: background-color 0.2s;
+    border: none;
+    cursor: pointer;
+}
+.group-btn.selected { background: #003f7f; border: 2px solid white; }
+.group-btn:hover { background: #0056b3; }
+.loader {
+    margin-top: 10px;
+    text-align: center;
+    font-size: 18px;
+    color: #555;
+    display: none;
+}
+.loader span {
+    animation: spin 1s linear infinite;
+    font-size: 28px;
+    margin-right: 8px;
+    display: inline-block;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg);}
+    100% {transform: rotate(360deg);}
+}
+.date-big {
+  font-size: 1.8em;
+  letter-spacing: 2px;
+  font-family: Calibri, "Microsoft JhengHei", Arial, sans-serif;
+  font-weight: bold;
+  display: block;        /* 或 inline-block */
+  text-align: center;
+  margin: 0 auto;
+}
+
+</style>
 
 <h1 style="text-align:center;">
   {% if table == 'hololive' %}🎬 Hololive 直播情報
@@ -30,51 +231,89 @@
         </a>
     {% endfor %}
 </div>
-
 <div class="loader" id="loader">
   <span>🔄</span> 載入中，請稍候...
 </div>
 
 {% for card in cards %}
-<div class="card-flex">
-  <div class="card-left">
-    <a href="{{ card.url }}" target="_blank">
-      <img class="card-avatar" src="{{ card.info.channel_avatar }}" alt="{{ card.name }}">
-    </a>
-    <p><strong>{{ card.name }}</strong></p>
-  </div>
-
-  <div class="card-right">
-    <div class="video-block">
-      <p><b>🎬 最新影片：</b></p>
-      <a href="{{ card.info.latest_video.url }}" target="_blank">
-        <img class="thumb" src="{{ card.info.latest_video.thumbnail }}"><br>
-        {{ card.info.latest_video.title }}
-      </a>
-      <p>🗓 上傳時間：{{ card.info.latest_video.published_at }}</p>
-      <p>⏱ 長度：{{ card.info.latest_video.duration }}</p>
-      <p>👁 觀看數：{{ card.info.latest_video.view_count }}</p>
-    </div>
-
-    <div class="live-block">
-      <p><b>📢 預計直播：</b></p>
-        {% if card.info.live and card.info.live.start_time %}
-            <a href="{{ card.info.live.url }}" target="_blank">
-                <img class="thumb" src="{{ card.info.live.thumbnail }}"><br>
-                {{ card.info.live.title }}
-            </a>
-            <p>🕒 預定開始：{{ card.info.live.start_time }}</p>
-        {% else %}
-            <div style="width:100%; max-width:300px; height:auto; background:#eee; border-radius:8px; padding:10px; text-align:center;">
-                <p style="margin:0;">目前沒有規劃</p>
+<div class="triple-card-row">
+    <!-- 卡1：頭像+名稱（上下置中） -->
+    <div class="triple-card avatar-card">
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+            <div class="avatar-box">
+                <img class="avatar"
+                     src="{{ card.info.channel_avatar }}"
+                     alt="{{ card.name }}"
+                     onerror="this.onerror=null;this.src='/static/default-avatar.png';">
             </div>
-        {% endif %}
+            <div class="channel-name">{{ card.name }}</div>
+        </div>
     </div>
+    <!-- 卡2：最新影片 -->
+    <div class="triple-card">
+        <div class="section-title"><i>🎬</i>最新影片</div><br>
+        <div class="video-block">
+            <a href="{{ card.info.latest_video.url }}" target="_blank">
+                <img class="thumb"
+                     src="{{ card.info.latest_video.thumbnail }}"
+                     alt="{{ card.info.latest_video.title }}"
+                     onerror="this.onerror=null;this.src='/static/default-thumb.png';">
+            </a>
+            <div class="video-title">
+                <a href="{{ card.info.latest_video.url }}" target="_blank" style="color:inherit;text-decoration:none;">
+                    {{ card.info.latest_video.title }}
+                </a>
+            </div><br>
+            <div class="video-meta">
+              <div class="meta-list">
+                <div class="meta-row">
+                  <span class="meta-icon">📅</span>
+                  <span class="meta-text">播放日期:   {{ card.info.latest_video.published_at|slice:":10" }}</span>
+                </div>
+                <div class="meta-row">
+                  <span class="meta-icon">⏱️</span>
+                  <span class="meta-text">影片長度:   {{ card.info.latest_video.duration }}</span>
+                </div>
+                <div class="meta-row">
+                  <span class="meta-icon">👁️</span>
+                  <span class="meta-text">觀看次數:   {{ card.info.latest_video.view_count }}</span>
+                </div>
+              </div>
+            </div>
+        </div>
+    </div>
+    <!-- 卡3：預計直播 -->
+    <div class="triple-card">
+        <div class="section-title"><i>📢</i>預計直播</div><br>
+        <div class="live-block">
+            {% if card.info.live and card.info.live.start_time %}
+                <a href="{{ card.info.live.url }}" target="_blank">
+                    <img class="thumb"
+                         src="{{ card.info.live.thumbnail }}"
+                         alt="{{ card.info.live.title }}"
+                         onerror="this.onerror=null;this.src='/static/default-thumb.png';">
+                </a>
+                <div class="live-title">
+                    <a href="{{ card.info.live.url }}" target="_blank" style="color:inherit;text-decoration:none;">
+                        {{ card.info.live.title }}
+                    </a>
+                </div><br>
+                <div class="live-info">
+				  <span class="meta-icon">⏰</span>
+				  預計直播時間
+				  <span class="meta-icon">⏰</span><br>
+				  <span class="date-big">{{ card.info.live.start_time|slice:":10" }}</span>
+				  <span class="date-big">{{ card.info.live.start_time|slice:"11:" }}</span>
+				</div>
 
-  </div>
+            {% else %}
+                <div class="no-live">目前沒有規劃</div>
+            {% endif %}
+        </div>
+    </div>
 </div>
-
 {% endfor %}
+
 {% if latest_update %}
   <div style="text-align: right; margin-top: 30px; font-size: 14px; color: gray;">
     最後更新時間：{{ latest_update|date:"Y-m-d H:i:s" }}
