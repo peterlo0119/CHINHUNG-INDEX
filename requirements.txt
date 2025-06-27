@@ -11,3 +11,7 @@ gunicorn
 isodate
 whitenoise
 django-extensions
+# --- AI 相關 ---
+tensorflow>=2.10.0
+numpy
+Pillow
