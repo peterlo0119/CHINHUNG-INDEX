@@ -179,9 +179,9 @@ from django.conf import settings
 
 
 # 載入你的模型（只需執行一次）
-from tensorflow.keras.models import load_model
-MODEL_PATH = os.path.join(settings.BASE_DIR, 'mainapp', 'model', 'mnist_model.h5')
-model = load_model(MODEL_PATH)
+#from tensorflow.keras.models import load_model
+#MODEL_PATH = os.path.join(settings.BASE_DIR, 'mainapp', 'model', 'mnist_model.h5')
+#model = load_model(MODEL_PATH)
 
 @csrf_exempt
 def predict_digit(request):
